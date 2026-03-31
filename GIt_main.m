@@ -16,7 +16,7 @@
 % 创建并切换到branch_2分支（等价于git branch + git checkout）
 !git switch main                  
 % 切换到master主分支
-!git switch branch_2                
+!git switch codex/integrate-new-modules-into-robotic-system                
 % 切换到branch_2分支
 !git branch                         
 % 查看本地所有分支列表（当前分支会标*）
@@ -38,6 +38,10 @@
 % =========================================================================
 !git reset --hard
 !git pull origin main
+
+!git fetch
+!git branch -r
+
 
 % =========================================================================
 % 日志查看相关命令

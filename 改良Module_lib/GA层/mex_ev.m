@@ -18,7 +18,7 @@ install_active = install_gene(1:num_modules);
 align_active   = align_gene(1:num_modules);
 
 % 1. 解码染色体 x 还原为构型参数（支持集成模块）
-[module_var, install_var, align_var, num_connect_var] = decode_integrated_modules_0331(module_active, install_active, align_active, RP_data);
+[module_var, install_var, align_var, num_connect_var] = expand_module_units(module_active, install_active, align_active, RP_data);
 
 module  = [1 2 1 module_var];
 install = [1 1 1 install_var];
