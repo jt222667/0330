@@ -176,6 +176,14 @@ PBcp(:,2) = Bcp(1:3,4,2);
 RBcp(:,:,3) = Bcp(1:3,1:3,3);
 PBcp(:,3) = Bcp(1:3,4,3);
 
+%% 集成模块（用于GA高层解码，不改变底层运动学求解器）
+% 说明：id 为 GA 编码使用的“虚拟模块编号”，在评价时会展开为基础模块序列。
+integrated_modules = struct('id', {}, 'module', {}, 'install', {}, 'align', {}, 'num_connect', {});
+integrated_modules(1) = struct('id', 11, 'module', [1 2],       'install', [1 1],       'align', [0 0],       'num_connect', 1);
+integrated_modules(2) = struct('id', 12, 'module', [3 4],       'install', [1 1],       'align', [0 0],       'num_connect', 1);
+integrated_modules(3) = struct('id', 13, 'module', [1 2 1],     'install', [1 1 1],     'align', [0 0 0],     'num_connect', 1);
+integrated_modules(4) = struct('id', 14, 'module', [3 4 1 4 1], 'install', [1 1 1 1 1], 'align', [0 0 0 0 0], 'num_connect', 1);
+
 %% 信息存储
 RP_data.Rp = Rp; % [模块近端] --> [关节] 的旋转矩阵，维度：(3, 3, 模块数)
 RP_data.Rd = Rd; % [关节] --> [模块远端] 的旋转矩阵，维度：(3, 3, 模块数)
@@ -186,6 +194,8 @@ RP_data.PBcp = PBcp; % [基座原点] --> [基座接口处] 的位移向量，�
 RP_data.J_type = J_type;
 RP_data.T_L = T_L;
 RP_data.T_B = T_B;
+RP_data.integrated_modules = integrated_modules;
+RP_data.module_gene_upper = max([5, [integrated_modules.id]]);
 
 len = Pp + Pd;
 col_norms = vecnorm(len(:,1:5));
@@ -205,7 +215,11 @@ RP_data.weight_cfg = struct( ...
     ...
     'num_modules_ref', 1, ...
     'lambda_num_modules', 1, ...
-    'p_num_modules', 1 ...
+    'p_num_modules', 1, ...
+    ...
+    'num_connect_ref', 1, ...
+    'lambda_num_connect', 1, ...
+    'p_num_connect', 1 ...
 );
 
 end

@@ -9,7 +9,7 @@ function [state, options, optchanged] = ga_outfun(options, state, flag, goal, RP
         case 'init'
             best_cost_history = [];
             best_x_history = [];
-            tracked_best = struct('cost', Inf, 'x', [], 'q_opt', [], 'w', NaN, 'sig', NaN, 'num_modules', NaN);
+            tracked_best = struct('cost', Inf, 'x', [], 'q_opt', [], 'w', NaN, 'sig', NaN, 'num_modules', NaN, 'num_connect', NaN, 'module_expanded', []);
 
         case 'iter'
             % 提取当代最优cost最小对应的x
@@ -30,6 +30,8 @@ function [state, options, optchanged] = ga_outfun(options, state, flag, goal, RP
                 tracked_best.q_opt = detail.q_opt;
                 tracked_best.sig = detail.sig;
                 tracked_best.num_modules = detail.num_modules;
+                tracked_best.num_connect = detail.num_connect;
+                tracked_best.module_expanded = detail.module_expanded;
             end
 
             % 打印（可选）
