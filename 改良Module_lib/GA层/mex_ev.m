@@ -23,7 +23,7 @@ align_active   = align_gene(1:num_modules);
 module  = [1 2 1 module_var];
 install = [1 1 1 install_var];
 align   = [0 0 0 align_var];
-num_connect = 3 + num_connect_var;
+num_connect = num_connect_var;
 detail.num_connect = num_connect;
 detail.module_expanded = module;
 % 为简化问题，固定串联拓扑
