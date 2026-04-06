@@ -105,40 +105,39 @@ Rd(:,:,3) = Md(1:3,1:3,3);
 Pd(:,3) =Md(1:3,4,3);
 
 %% module 4
-% 连杆模块，信息用T_L存储
-J_type(4) = 'L';
+% 关节模块（新增），信息用Rp Pp Rd Pd存储
+J_type(4) = 'R';
 
 theta_prox(1,4) = 0;
-d_prox(1,4) = 0.5;
+d_prox(1,4) = 0.8;
 a_prox(1,4) = 0;
-alf_prox(1,4) = -pi/2;
+alf_prox(1,4) = 0;
 Mp(:,:,4) = subs(SDH, {theta, d, a, alf}, {theta_prox(1,4), d_prox(1,4), a_prox(1,4), alf_prox(1,4)});
 Rp(:,:,4) = Mp(1:3,1:3,4);
 Pp(:,4) =Mp(1:3,4,4);
 
 theta_dist(1,4) = 0;
-d_dist(1,4) = 0.5;
+d_dist(1,4) = 0.2;
 a_dist(1,4) = 0;
 alf_dist(1,4) = 0;
 Md(:,:,4) = subs(SDH, {theta, d, a, alf}, {theta_dist(1,4), d_dist(1,4), a_dist(1,4), alf_dist(1,4)});
 Rd(:,:,4) = Md(1:3,1:3,4);
 Pd(:,4) =Md(1:3,4,4);
 
-T_L(:,:,4) = Mp(:,:,4)*Md(:,:,4);
-
 %% module 5
+% 连杆模块（新增），参数与 module 1 相同
 J_type(5) = 'L';
 
 theta_prox(1,5) = 0;
-d_prox(1,5) = 0.5;
+d_prox(1,5) = 0.8;
 a_prox(1,5) = 0;
-alf_prox(1,5) = -pi/4;
+alf_prox(1,5) = 0;
 Mp(:,:,5) = subs(SDH, {theta, d, a, alf}, {theta_prox(1,5), d_prox(1,5), a_prox(1,5), alf_prox(1,5)});
 Rp(:,:,5) = Mp(1:3,1:3,5);
 Pp(:,5) =Mp(1:3,4,5);
 
 theta_dist(1,5) = 0;
-d_dist(1,5) = 0.5;
+d_dist(1,5) = 0.2;
 a_dist(1,5) = 0;
 alf_dist(1,5) = 0;
 Md(:,:,5) = subs(SDH, {theta, d, a, alf}, {theta_dist(1,5), d_dist(1,5), a_dist(1,5), alf_dist(1,5)});
@@ -148,8 +147,52 @@ Pd(:,5) =Md(1:3,4,5);
 T_L(:,:,5) = Mp(:,:,5)*Md(:,:,5);
 
 %% module 6
+% 连杆模块（原 module 4，编号顺延 +2）
+J_type(6) = 'L';
+
+theta_prox(1,6) = 0;
+d_prox(1,6) = 0.5;
+a_prox(1,6) = 0;
+alf_prox(1,6) = -pi/2;
+Mp(:,:,6) = subs(SDH, {theta, d, a, alf}, {theta_prox(1,6), d_prox(1,6), a_prox(1,6), alf_prox(1,6)});
+Rp(:,:,6) = Mp(1:3,1:3,6);
+Pp(:,6) =Mp(1:3,4,6);
+
+theta_dist(1,6) = 0;
+d_dist(1,6) = 0.5;
+a_dist(1,6) = 0;
+alf_dist(1,6) = 0;
+Md(:,:,6) = subs(SDH, {theta, d, a, alf}, {theta_dist(1,6), d_dist(1,6), a_dist(1,6), alf_dist(1,6)});
+Rd(:,:,6) = Md(1:3,1:3,6);
+Pd(:,6) =Md(1:3,4,6);
+
+T_L(:,:,6) = Mp(:,:,6)*Md(:,:,6);
+
+%% module 7
+% 连杆模块（原 module 5，编号顺延 +2）
+J_type(7) = 'L';
+
+theta_prox(1,7) = 0;
+d_prox(1,7) = 0.5;
+a_prox(1,7) = 0;
+alf_prox(1,7) = -pi/4;
+Mp(:,:,7) = subs(SDH, {theta, d, a, alf}, {theta_prox(1,7), d_prox(1,7), a_prox(1,7), alf_prox(1,7)});
+Rp(:,:,7) = Mp(1:3,1:3,7);
+Pp(:,7) =Mp(1:3,4,7);
+
+theta_dist(1,7) = 0;
+d_dist(1,7) = 0.5;
+a_dist(1,7) = 0;
+alf_dist(1,7) = 0;
+Md(:,:,7) = subs(SDH, {theta, d, a, alf}, {theta_dist(1,7), d_dist(1,7), a_dist(1,7), alf_dist(1,7)});
+Rd(:,:,7) = Md(1:3,1:3,7);
+Pd(:,7) =Md(1:3,4,7);
+
+T_L(:,:,7) = Mp(:,:,7)*Md(:,:,7);
+
+%% module 8
 % 基座模块，现在将其视作模块，0,1,2,3对应基座原点和基座上的接口，这里计算T13,T12
-J_type(6) = 'B';
+J_type(8) = 'B';
 T01 = [1 0 0 0;
     0 1 0 0;
     0 0 1 0.5;
@@ -180,9 +223,9 @@ PBcp(:,3) = Bcp(1:3,4,3);
 % 说明：id 为 GA 编码使用的“虚拟模块编号”，在评价时会展开为基础模块序列。
 RP_data.integrated_modules = {
     struct('module', [1 2], 'install', [1 1], 'align', [0 0]), ...
-    struct('module', [3 4], 'install', [1 1], 'align', [0 0]), ...
+    struct('module', [4], 'install', [1], 'align', [0]), ...
     struct('module', [1 2 1], 'install', [1 1 1], 'align', [0 0 0]), ...
-    struct('module', [3 4 1 4 1], 'install', [1 1 1 1 1], 'align', [0 0 0 0 0]) ...
+    struct('module', [3 6 1 6 1], 'install', [1 1 1 1 1], 'align', [0 0 0 0 0]) ...
 };
 
 %% 信息存储
