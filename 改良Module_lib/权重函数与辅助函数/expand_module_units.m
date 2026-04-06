@@ -1,4 +1,4 @@
-function [module_out, install_out, align_out, num_modules_physical] = expand_module_units(module_units, install_units, align_units, RP_data)
+function [module_out, install_out, align_out, num_modules_physical, is_valid] = expand_module_units(module_units, install_units, align_units, RP_data)
 
 module_out = [];
 install_out = [];
@@ -45,4 +45,65 @@ for i = 1:length(module_units)
     end
 end
 
+is_valid = is_valid_expanded_config(module_out, install_out, RP_data);
+
+end
+
+function is_valid = is_valid_expanded_config(module_var, install_var, RP_data)
+is_valid = true;
+
+if isempty(module_var)
+    is_valid = false;
+    return;
+end
+
+num_revolute = sum(RP_data.J_type(module_var) == 'R');
+if num_revolute < 6 || num_revolute > 7
+    is_valid = false;
+    return;
+end
+
+for i = 1:(length(module_var) - 1)
+    if module_var(i) == 1 && module_var(i+1) == 1
+        is_valid = false;
+        return;
+    end
+
+    if module_var(i) == 1 && module_var(i+1) == 3 && install_var(i+1) == 0
+        is_valid = false;
+        return;
+    end
+
+    if module_var(i) == 3 && module_var(i+1) == 1 && install_var(i) == 1
+        is_valid = false;
+        return;
+    end
+
+    if module_var(i) == 3 && module_var(i+1) == 3 && install_var(i) == 1 && install_var(i+1) == 0
+        is_valid = false;
+        return;
+    end
+end
+
+for i = 1:(length(module_var) - 2)
+    if module_var(i) == 1 && module_var(i+1) == 5 && module_var(i+2) == 1
+        is_valid = false;
+        return;
+    end
+
+    if module_var(i) == 1 && module_var(i+1) == 5 && module_var(i+2) == 3 && install_var(i+2) == 0
+        is_valid = false;
+        return;
+    end
+
+    if module_var(i) == 3 && module_var(i+1) == 5 && module_var(i+2) == 1 && install_var(i) == 1
+        is_valid = false;
+        return;
+    end
+
+    if module_var(i) == 3 && module_var(i+1) == 5 && module_var(i+2) == 3 && install_var(i) == 1 && install_var(i+2) == 0
+        is_valid = false;
+        return;
+    end
+end
 end
