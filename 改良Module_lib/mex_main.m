@@ -7,14 +7,16 @@ RP_data = Module_Lib();
 % 权重设置
 RP_data.weight_cfg.lambda_sig = 1;
 RP_data.weight_cfg.lambda_w = 1;
-RP_data.weight_cfg.lambda_num_modules = 1;
+RP_data.weight_cfg.lambda_num_modules = 0;
+RP_data.weight_cfg.lambda_num_connect = 0;
 
 %% 2. 【定义任务点】
 % 仅有任务点够吗？之后是否需要根据任务类型改变寻优策略
 goal = [0;0;8];
 
 %% 3. 【遗传算法参数设置】
-num_modules_upper = calc_modules_upper_0318(goal,RP_data);    % 根据任务点限制模块上限
+% num_modules_upper = calc_modules_upper_0318(goal,RP_data);    % 根据任务点限制模块上限
+num_modules_upper = 7;
 num_modules_lower = 1;                                        % 至少保留1个可变模块
 
 % 染色体编码：
@@ -28,7 +30,7 @@ lb = [num_modules_lower, ...
       ones(1, num_modules_upper)*0, ...
       ones(1, num_modules_upper)*0];
 ub = [num_modules_upper, ...
-      ones(1, num_modules_upper)*5, ...
+      ones(1, num_modules_upper)*9, ...
       ones(1, num_modules_upper)*1, ...
       ones(1, num_modules_upper)*2];
 
@@ -69,6 +71,8 @@ if evalin('base', "exist('tracked_best','var')")
         best_detail.w = ga_tracked_best.w;
         best_detail.sig = ga_tracked_best.sig;
         best_detail.num_modules = ga_tracked_best.num_modules;
+        best_detail.num_connect = ga_tracked_best.num_connect;
+        best_detail.module_expanded = ga_tracked_best.module_expanded;
     end
 end
 
@@ -85,7 +89,13 @@ best_install = install_gene(1:num_modules);
 best_align   = align_gene(1:num_modules);
 
 fprintf('Best num_modules: %d\n', num_modules);
-fprintf('Module:  [%s]\n', num2str(best_module));
+if isfield(best_detail, 'num_connect')
+    fprintf('Best num_connect: %d\n', best_detail.num_connect);
+end
+fprintf('Module(units):  [%s]\n', num2str(best_module));
+if isfield(best_detail, 'module_expanded') && ~isempty(best_detail.module_expanded)
+    fprintf('Module(expanded): [%s]\n', num2str(best_detail.module_expanded));
+end
 fprintf('Install: [%s]\n', num2str(best_install));
 fprintf('Align:   [%s]\n', num2str(best_align));
  

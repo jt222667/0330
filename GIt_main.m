@@ -16,7 +16,7 @@
 % 创建并切换到branch_2分支（等价于git branch + git checkout）
 !git switch main                  
 % 切换到master主分支
-!git switch branch_2                
+!git switch codex/integrate-new-modules-into-robotic-system                
 % 切换到branch_2分支
 !git branch                         
 % 查看本地所有分支列表（当前分支会标*）
@@ -29,15 +29,19 @@
 !git add .                          
 % 将当前目录下所有修改、新增文件添加到暂存区
 % 将本地branch_2分支推送到远程仓库（首次推送会创建远程分支）
-!git commit -a -m "3.30 "
+!git commit -a -m "4.2 "
 % 将当前分支的本地提交推送到远程对应分支（需已关联远程分支）
-!git push origin main  
+!git push 
         
 % =========================================================================
 % 拉到本地
 % =========================================================================
 !git reset --hard
 !git pull origin main
+
+!git fetch
+!git branch -r
+
 
 % =========================================================================
 % 日志查看相关命令

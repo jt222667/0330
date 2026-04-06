@@ -1,6 +1,6 @@
 function [cost, detail] = mex_ev(x, goal, RP_data)
 cost = 0;
-detail = struct('x', x, 'flag', 1, 'q_opt', [], 'w', NaN,  'sig', NaN, 'num_modules', NaN);
+detail = struct('x', x, 'flag', 1, 'q_opt', [], 'w', NaN,  'sig', NaN, 'num_modules', NaN, 'num_connect', NaN, 'module_expanded', []);
 
 % 染色体编码：
 % x = [num_modules, module(1:upper), install(1:upper), align(1:upper)]
@@ -17,12 +17,25 @@ module_active  = module_gene(1:num_modules);
 install_active = install_gene(1:num_modules);
 align_active   = align_gene(1:num_modules);
 
-% 1. 解码染色体 x 还原为构型参数
-module  = [1 2 1 module_active];
-install = [1 1 1 install_active];
-align   = [0 0 0 align_active];
+% 1. 解码染色体 x 还原为构型参数（支持集成模块）
+[module_var, install_var, align_var, num_connect_var, is_valid_config] = expand_module_units(module_active, install_active, align_active, RP_data);
+
+if ~is_valid_config
+    cost = 1e12; % 惩罚项：违反预筛选约束，直接淘汰
+    detail.flag = 1;
+    detail.module_expanded = [1 2 1 module_var];
+    detail.num_connect = num_connect_var;
+    return;
+end
+
+module  = [1 2 1 module_var];
+install = [1 1 1 install_var];
+align   = [0 0 0 align_var];
+num_connect = num_connect_var;
+detail.num_connect = num_connect;
+detail.module_expanded = module;
 % 为简化问题，固定串联拓扑
-sequence = [0, 1, 2, 0, 4:(num_modules+2)];
+sequence = [0, 1, 2, 0, 4:(length(module)-1)];
 
 % 2. 生成运动学模型
 LP = LP_generate(module, install, align, sequence, RP_data);
@@ -50,7 +63,8 @@ else
     cost = cost ...
         + weight_w(w, RP_data.weight_cfg) ...
         + weight_sig(sig, RP_data.weight_cfg) ...
-        + weight_num_modules(num_modules, RP_data.weight_cfg);
+        + weight_num_modules(num_modules, RP_data.weight_cfg) ...
+        + weight_num_connect(num_connect, RP_data.weight_cfg);
 
     detail.flag = 0;
     detail.q_opt = q_sol;
