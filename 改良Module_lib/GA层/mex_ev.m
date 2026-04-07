@@ -18,24 +18,23 @@ install_active = install_gene(1:num_modules);
 align_active   = align_gene(1:num_modules);
 
 % 1. 解码染色体 x 还原为构型参数（支持集成模块）
-[module_var, install_var, align_var, num_connect_var, is_valid_config] = expand_module_units(module_active, install_active, align_active, RP_data);
-
+[module_var, install_var, align_var, num_connect_var, is_valid_config, ~] = expand_module_units(module_active, install_active, align_active, RP_data);
 if ~is_valid_config
     cost = 1e12; % 惩罚项：违反预筛选约束，直接淘汰
     detail.flag = 1;
-    detail.module_expanded = [1 2 1 module_var];
+    detail.module_expanded = [5 module_var];
     detail.num_connect = num_connect_var;
     return;
 end
 
-module  = [1 2 1 module_var];
-install = [1 1 1 install_var];
-align   = [0 0 0 align_var];
+module  = [5 module_var];
+install = [1 install_var];
+align   = [0 align_var];
 num_connect = num_connect_var;
 detail.num_connect = num_connect;
 detail.module_expanded = module;
 % 为简化问题，固定串联拓扑
-sequence = [0, 1, 2, 0, 4:(length(module)-1)];
+sequence = [0, 0, 2:(length(module))];
 
 % 2. 生成运动学模型
 LP = LP_generate(module, install, align, sequence, RP_data);
@@ -51,7 +50,7 @@ Goal.POS{Goal.change==1} = goal;
 
 % 4. 评价指标计算
 if flag
-    cost = 1e12; % 惩罚项：如果工作点不可达，赋予极大的惩罚值，直接淘汰
+    cost = 1e12; % 惩罚项：违反预筛选约束，直接淘汰
     detail.flag = 1;
     return;
 else
