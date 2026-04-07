@@ -13,13 +13,13 @@ X = repmat(lb, num_particles, 1) + rand(num_particles, nvars) .* repmat((ub - lb
 V = zeros(num_particles, nvars);
 
 PbestX = X;
-PbestF = inf(num_particles, 4);
+PbestF = inf(num_particles, 3);
 
 archiveX = zeros(0, nvars);
-archiveF = zeros(0, 4);
+archiveF = zeros(0, 3);
 
 for iter = 1:max_iters
-    F = zeros(num_particles, 4);
+    F = zeros(num_particles, 3);
 
     for i = 1:num_particles
         x_eval = sanitize_x(X(i, :), lb, ub);
@@ -68,7 +68,7 @@ end
 
 % 从Pareto解中按权重选择单一推荐解，便于兼容原输出
 weights = [RP_data.weight_cfg.lambda_sig, RP_data.weight_cfg.lambda_w, ...
-           RP_data.weight_cfg.lambda_num_modules, RP_data.weight_cfg.lambda_num_connect];
+           RP_data.weight_cfg.lambda_num_modules];
 [best_idx, best_score] = weighted_pick(archiveF, weights);
 best_x = archiveX(best_idx, :);
 
@@ -171,7 +171,7 @@ keep_idx = order(1:max_num);
 end
 
 function [idx, score] = weighted_pick(F, w)
-% 将四个目标做min-max归一化后加权求和
+% 将三个目标做min-max归一化后加权求和
 fmin = min(F, [], 1);
 fmax = max(F, [], 1);
 den = fmax - fmin;

@@ -12,7 +12,6 @@ RP_data = Module_Lib();
 RP_data.weight_cfg.lambda_sig = 1;
 RP_data.weight_cfg.lambda_w = 1;
 RP_data.weight_cfg.lambda_num_modules = 1;
-RP_data.weight_cfg.lambda_num_connect = 1;
 
 %% 2. 【定义任务点】
 goal = [0;0;10];
@@ -41,7 +40,7 @@ mopso_options.C1 = 1.5;
 mopso_options.C2 = 1.5;
 
 %% 5. 【调用 MOPSO 求解】
-fprintf('开始构型寻优（MOPSO，多目标：sig / 1-w / num_modules / num_connect）...\n');
+fprintf('开始构型寻优（MOPSO，多目标：sig / 1-w / num_modules）...\n');
 result = mopso_optimize(goal, RP_data, nvars, lb, ub, mopso_options);
 
 best_x = result.best_x;
@@ -60,9 +59,6 @@ best_align   = align_gene(1:num_modules);
 
 fprintf('Pareto 解数量: %d\n', size(result.pareto_x, 1));
 fprintf('Best num_modules: %d\n', num_modules);
-if isfield(best_detail, 'num_connect')
-    fprintf('Best num_connect: %d\n', best_detail.num_connect);
-end
 fprintf('Module(units):  [%s]\n', num2str(best_module));
 if isfield(best_detail, 'module_expanded') && ~isempty(best_detail.module_expanded)
     fprintf('Module(expanded): [%s]\n', num2str(best_detail.module_expanded));
