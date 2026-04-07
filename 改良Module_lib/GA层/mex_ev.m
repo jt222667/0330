@@ -18,60 +18,9 @@ install_active = install_gene(1:num_modules);
 align_active   = align_gene(1:num_modules);
 
 % 1. 解码染色体 x 还原为构型参数（支持集成模块）
-[module_var, install_var, align_var, num_connect_var, is_valid_config, config_err] = expand_module_units(module_active, install_active, align_active, RP_data);
-
+[module_var, install_var, align_var, num_connect_var, is_valid_config, ~] = expand_module_units(module_active, install_active, align_active, RP_data);
 if ~is_valid_config
-    % 违反预筛选约束时，使用"可分级"惩罚而非绝对淘汰：
-    % 让GA仍可比较"更接近可行"的模块组合。
-    if isempty(module_var)
-        cost = 3e4;
-        detail.flag = 1;
-        detail.module_expanded = 5;
-        detail.num_connect = num_connect_var;
-        return;
-    end
-
-    J_var = RP_data.J_type(module_var);
-    numR = sum(J_var == 'R');
-    numR_violation = max(0, 6 - numR) + max(0, numR - 7);
-
-    is_link = (J_var == 'L');
-    edge_link_violation = double(is_link(1)) + double(is_link(end));
-    adj_link_violation = sum(is_link(1:end-1) & is_link(2:end));
-
-    m1 = module_var(1:end-1); m2 = module_var(2:end);
-    i1 = install_var(1:end-1); i2 = install_var(2:end);
-    pair_violation = ...
-        sum(m1==1 & m2==1) + ...
-        sum(m1==1 & m2==3 & i2==0) + ...
-        sum(m1==3 & m2==1 & i1==1) + ...
-        sum(m1==3 & m2==3 & i1==1 & i2==0);
-
-    tri_violation = 0;
-    if numel(module_var) >= 3
-        t1 = module_var(1:end-2); t2 = module_var(2:end-1); t3 = module_var(3:end);
-        ti1 = install_var(1:end-2); ti3 = install_var(3:end);
-        tri_violation = ...
-            sum(t1==1 & t2==5 & t3==1) + ...
-            sum(t1==1 & t2==5 & t3==3 & ti3==0) + ...
-            sum(t1==3 & t2==5 & t3==1 & ti1==1) + ...
-            sum(t1==3 & t2==5 & t3==3 & ti1==1 & ti3==0);
-    end
-
-    code_penalty = 0;
-    if isstruct(config_err) && isfield(config_err, 'code')
-        code_penalty = max(config_err.code, 0);
-    end
-
-    invalid_score = ...
-        3.0 * numR_violation + ...
-        2.0 * edge_link_violation + ...
-        2.5 * adj_link_violation + ...
-        2.0 * pair_violation + ...
-        2.5 * tri_violation + ...
-        0.2 * code_penalty;
-
-    cost = 1e4 + 2e3 * invalid_score; % 平滑惩罚：越"接近可行"代价越低
+    cost = 1e12; % 惩罚项：违反预筛选约束，直接淘汰
     detail.flag = 1;
     detail.module_expanded = [5 module_var];
     detail.num_connect = num_connect_var;
@@ -101,13 +50,7 @@ Goal.POS{Goal.change==1} = goal;
 
 % 4. 评价指标计算
 if flag
-    % 工作点不可达时，不做绝对淘汰；基于末端位姿误差进行分级惩罚，
-    % 引导GA优先搜索"更接近可解"的关节组合。
-    pos_err = 0;
-    for i = find(Goal.change==1)
-        pos_err = pos_err + norm(Goal.POS{i} - SV.POS_e{i});
-    end
-    cost = 2e4 + 8e4 * pos_err + 1e4 * (pos_err^2);
+    cost = 1e12; % 惩罚项：违反预筛选约束，直接淘汰
     detail.flag = 1;
     return;
 else
