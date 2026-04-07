@@ -18,7 +18,7 @@ install_active = install_gene(1:num_modules);
 align_active   = align_gene(1:num_modules);
 
 % 1. 解码染色体 x 还原为构型参数（支持集成模块）
-[module_var, install_var, align_var, num_connect_var, is_valid_config] = expand_module_units(module_active, install_active, align_active, RP_data);
+[module_var, install_var, align_var, num_connect_var, is_valid_config, ~] = expand_module_units(module_active, install_active, align_active, RP_data);
 
 if ~is_valid_config
     cost = 1e12; % 惩罚项：违反预筛选约束，直接淘汰

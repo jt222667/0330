@@ -5,7 +5,7 @@ clear;
 RP_data = Module_Lib();
 Configuration_Lib = { ...
     [1 2 1], ...
-    [1 2 1 2 1 2 1], ...
+    [7], ...
     [1 2 3 1 2 3 1], ...
     [1 1 1 2 1 2 2], ...
     [2 2 2 2 2 2 2], ...
@@ -34,28 +34,36 @@ sequence = [ ...
     % 0  11 12 13 14 15 16, ...
     ];
 
+[module_out, install_out, align_out, num_modules_physical, is_valid,err] = expand_module_units(module, install, align, RP_data);
+
+
 LP = LP_generate(module, install, align, sequence, RP_data);
 SV = SV_generate(LP);
 
 % 正运动学
-% q0 = rand(LP.num_joint,1)  * pi * 2;
-% SV = Trans_aa_pos_init(LP, SV, q0);
+q0 = rand(LP.num_joint,1)  * pi * 0;
+q0(1)=pi/2;
+
+q0(2)=pi/6;
+SV = Trans_aa_pos_init(LP, SV, q0);
+PlotSV(LP,SV);
 
 %% w 计算
 % %% 目标设置
-Goal = Goal_init(SV);
-Goal.change = [0 1 0];
-Goal.POS{Goal.change==1}  = [0;0;7];
+% Goal = Goal_init(SV);
+% Goal.change = [0 1 0];
+% Goal.POS{Goal.change==1}  = [0;0;13];
 
 % %% 该构型最佳可操作度
 % [LP, SV1, ~, ~] = check_kinematics_0323(LP, SV, Goal);
 % w_best = calc_Manipulability_0318(LP, SV1);
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
 % %% 逆运动学求解
-[LP, SV2, ~, ~] = check_kinematics_0325(LP, SV, Goal);
-w_ik = calc_Manipulability_0318(LP, SV2)
-[sig, ~] = calc_Accuracy_0325(LP, SV2)
-PlotSV(LP,SV2);
+% [LP, SV2, ~, ~] = check_kinematics_0325(LP, SV, Goal);
+% w_ik = calc_Manipulability_0318(LP, SV2)
+% [sig, ~] = calc_Accuracy_0325(LP, SV2)
+% PlotSV(LP,SV2);
+
 % %% 优化可操作度
 % [SV3, q_opt, w_opt] = max_w_NULLspace(LP, SV, 2);
 % [sig_opt, ~] = calc_Accuracy_0325(LP, SV3);
