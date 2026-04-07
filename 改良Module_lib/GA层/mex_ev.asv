@@ -26,7 +26,7 @@ if ~is_valid_config
     if isempty(module_var)
         cost = 3e4;
         detail.flag = 1;
-        detail.module_expanded = 5;
+        detail.module_expanded = [1 2 1];
         detail.num_connect = num_connect_var;
         return;
     end
@@ -73,7 +73,7 @@ if ~is_valid_config
 
     cost = 1e4 + 2e3 * invalid_score; % 平滑惩罚：越"接近可行"代价越低
     detail.flag = 1;
-    detail.module_expanded = [5 module_var];
+    detail.module_expanded = [1 2 1 module_var];
     detail.num_connect = num_connect_var;
     return;
 end
@@ -85,7 +85,7 @@ num_connect = num_connect_var;
 detail.num_connect = num_connect;
 detail.module_expanded = module;
 % 为简化问题，固定串联拓扑
-sequence = [0, 0, 2:(length(module))];
+sequence = [0, 0, 2:(length(module)-1)];
 
 % 2. 生成运动学模型
 LP = LP_generate(module, install, align, sequence, RP_data);

@@ -12,7 +12,7 @@ RP_data.weight_cfg.lambda_num_connect = 1;
 
 %% 2. 【定义任务点】
 % 仅有任务点够吗？之后是否需要根据任务类型改变寻优策略
-goal = [0;0;16];
+goal = [0;0;11];
 
 %% 3. 【遗传算法参数设置】
 % num_modules_upper = calc_modules_upper_0318(goal,RP_data);    % 根据任务点限制模块上限
@@ -100,3 +100,12 @@ fprintf('Cost:    %.6f\n', best_cost);
 fprintf('q_opt:   [%s]\n', num2str(best_detail.q_opt(:).'));
 fprintf('w_opt:   [%s]\n', num2str(best_detail.w(:).'));
 fprintf('sig_opt: %.6f\n', best_detail.sig);
+
+sequence = [0, 0, 2:(length(best_detail.module_expanded)-1)];
+LP = LP_generate(best_detail.module_expanded, [1 best_install], [0 best_align], sequence, RP_data);
+SV = SV_generate(LP);
+
+% 正运动学
+q0 = best_detail.q_opt;
+SV = Trans_aa_pos_init(LP, SV, q0);
+PlotSV(LP,SV);

@@ -12,15 +12,13 @@ RP_data.weight_cfg.lambda_num_connect = 1;
 
 %% 2. 【定义任务点】
 % 仅有任务点够吗？之后是否需要根据任务类型改变寻优策略
-goal = [0;0;11];
+goal = [0;0;10];
 
 %% 3. 【遗传算法参数设置】
-num_modules_upper = calc_modules_upper_0318(goal,RP_data);    % 根据任务点限制模块上限
-num_modules_lower = 1;                                        % 至少保留1个可变模块
+% num_modules_upper = calc_modules_upper_0318(goal,RP_data);    % 根据任务点限制模块上限
+num_modules_upper = 13;
+num_modules_lower = 2;                                        % 至少保留1个可变模块
 
-% 染色体编码：
-% x = [num_modules, module(1:upper), install(1:upper), align(1:upper)]
-% 实际评价只取前 num_modules 个模块参数
 nvars = 1 + 3 * num_modules_upper;
 IntCon = 1:nvars;
 
@@ -29,7 +27,7 @@ lb = [num_modules_lower, ...
       ones(1, num_modules_upper)*0, ...
       ones(1, num_modules_upper)*0];
 ub = [num_modules_upper, ...
-      ones(1, num_modules_upper)*9, ...
+      ones(1, num_modules_upper)*7, ...
       ones(1, num_modules_upper)*1, ...
       ones(1, num_modules_upper)*2];
 
@@ -37,7 +35,7 @@ ub = [num_modules_upper, ...
 options = optimoptions('ga', ...
     'Display', 'iter', ...
     ... % --- 种群与迭代 ---
-    'PopulationSize', 500, ...
+    'PopulationSize', 10000, ...
     'MaxGenerations', 200, ...
     'MaxStallGenerations', 5, ...
     ... % --- 算法行为 ---
@@ -102,3 +100,12 @@ fprintf('Cost:    %.6f\n', best_cost);
 fprintf('q_opt:   [%s]\n', num2str(best_detail.q_opt(:).'));
 fprintf('w_opt:   [%s]\n', num2str(best_detail.w(:).'));
 fprintf('sig_opt: %.6f\n', best_detail.sig);
+
+sequence = [0, 0, 2:(length(best_detail.module_expanded)-1)];
+LP = LP_generate(best_detail.module_expanded, best_install, best_align, sequence, RP_data);
+SV = SV_generate(LP);
+
+% 正运动学
+q0 = best_detail.q_opt;
+SV = Trans_aa_pos_init(LP, SV, q0);
+PlotSV(LP,SV);
